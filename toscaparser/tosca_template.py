@@ -199,7 +199,7 @@ class ToscaTemplate(object):
 
         if imports:
             custom_service = toscaparser.imports.\
-                ImportsLoader(imports, self.path,
+                ImportsLoader(imports, self.root_dir, self.path,
                               type_defs, self.tpl)
 
             nested_tosca_tpls = custom_service.get_nested_tosca_tpls()
@@ -281,6 +281,7 @@ class ToscaTemplate(object):
             if csar.validate():
                 csar.decompress()
                 self.a_file = True  # the file has been decompressed locally
+                self.root_dir = csar.temp_dir
                 return os.path.join(csar.temp_dir, csar.get_main_template())
         else:
             ExceptionCollector.appendException(

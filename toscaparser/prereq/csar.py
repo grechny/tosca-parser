@@ -200,7 +200,7 @@ class CSAR(object):
             main_tpl = self.get_main_template_yaml()
 
             if 'imports' in main_tpl:
-                ImportsLoader(main_tpl['imports'],
+                ImportsLoader(main_tpl['imports'], self.temp_dir,
                               os.path.join(self.temp_dir, main_tpl_file))
 
             if 'topology_template' in main_tpl:
@@ -263,7 +263,8 @@ class CSAR(object):
             msg = (_('The resource at "%s" cannot be accessed.') %
                    resource_file)
             try:
-                if UrlUtils.url_accessible(resource_file):
+                # it's better to check url format only instead of trying to open it
+                if UrlUtils.validate_url(resource_file):
                     return
                 else:
                     ExceptionCollector.appendException(
@@ -275,7 +276,6 @@ class CSAR(object):
                 self.error_caught = True
 
         if os.path.isfile(os.path.join(self.temp_dir,
-                                       os.path.dirname(tpl_file),
                                        resource_file)):
             return
 

@@ -33,11 +33,13 @@ class ImportsLoader(object):
                       ('file', 'repository', 'namespace_uri',
                        'namespace_prefix')
 
-    def __init__(self, importslist, path, type_definition_list=None,
+    # added 'root_dir' property for supporting an absolute paths
+    def __init__(self, importslist, root_dir, path, type_definition_list=None,
                  tpl=None):
         self.importslist = importslist
         self.custom_defs = {}
         self.nested_tosca_tpls = []
+        self.root_dir = root_dir
         if not path and not tpl:
             msg = _('Input tosca template is not provided.')
             log.warning(msg)
@@ -214,9 +216,7 @@ class ImportsLoader(object):
                         if os.path.isfile(file_name):
                             import_template = file_name
                         else:
-                            full_path = os.path.join(
-                                os.path.dirname(os.path.abspath(self.path)),
-                                file_name)
+                            full_path = os.path.join(self.root_dir, file_name)
                             if os.path.isfile(full_path):
                                 import_template = full_path
                             else:
