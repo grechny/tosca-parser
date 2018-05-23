@@ -241,11 +241,12 @@ class CSAR(object):
                                             main_tpl_file,
                                             operation,
                                             False)
-                                    elif isinstance(operation, dict):
-                                        if 'implementation' in operation:
-                                            self._validate_external_reference(
-                                                main_tpl_file,
-                                                operation['implementation'])
+                                    # todo: need to support 'primary' artifacts
+                                    # elif isinstance(operation, dict):
+                                    #     if 'implementation' in operation:
+                                    #         self._validate_external_reference(
+                                    #             main_tpl_file,
+                                    #             operation['implementation'])
         finally:
             if self.temp_dir:
                 shutil.rmtree(self.temp_dir)
