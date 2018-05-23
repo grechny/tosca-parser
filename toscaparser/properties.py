@@ -61,8 +61,8 @@ class Property(object):
         return self.schema.entry_schema
 
     def validate(self):
-        '''Validate if not a reference property.'''
-        if not is_function(self.value):
+        '''Validate if not a reference property. Ignore empty values'''
+        if self.value is not None and not is_function(self.value):
             if self.type == Schema.STRING:
                 self.value = str(self.value)
             self.value = DataEntity.validate_datatype(self.type, self.value,
