@@ -76,6 +76,7 @@ class ToscaTemplate(object):
         self.nested_tosca_templates_with_topology = []
         if path:
             self.input_path = path
+            self.root_dir = os.path.dirname(self.input_path)
             self.path = self._get_path(path)
             if self.path:
                 self.tpl = YAML_LOADER(self.path, self.a_file)
@@ -199,7 +200,7 @@ class ToscaTemplate(object):
 
         if imports:
             custom_service = toscaparser.imports.\
-                ImportsLoader(imports, self.root_dir, self.path,
+                ImportsLoader(imports, self.path, self.root_dir,
                               type_defs, self.tpl)
 
             nested_tosca_tpls = custom_service.get_nested_tosca_tpls()

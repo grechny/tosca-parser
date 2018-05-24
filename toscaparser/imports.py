@@ -34,7 +34,7 @@ class ImportsLoader(object):
                        'namespace_prefix')
 
     # added 'root_dir' property for supporting an absolute paths
-    def __init__(self, importslist, root_dir, path, type_definition_list=None,
+    def __init__(self, importslist, path, root_dir=None, type_definition_list=None,
                  tpl=None):
         self.importslist = importslist
         self.custom_defs = {}
@@ -217,8 +217,13 @@ class ImportsLoader(object):
                             import_template = file_name
                         else:
                             full_path = os.path.join(self.root_dir, file_name)
+                            relative_path = os.path.join(
+                                os.path.dirname(os.path.abspath(self.path)),
+                                file_name)
                             if os.path.isfile(full_path):
                                 import_template = full_path
+                            elif os.path.isfile(relative_path):
+                                import_template = relative_path
                             else:
                                 file_path = file_name.rpartition("/")
                                 dir_path = os.path.dirname(os.path.abspath(
@@ -233,8 +238,7 @@ class ImportsLoader(object):
                                                    % {'import_template':
                                                       import_template})
                                             log.error(msg)
-                                            ExceptionCollector.appendException
-                                            (ValueError(msg))
+                                            ExceptionCollector.appendException(ValueError(msg))
             else:  # template is pre-parsed
                 if os.path.isabs(file_name) and os.path.isfile(file_name):
                     a_file = True
@@ -248,18 +252,16 @@ class ImportsLoader(object):
                     return None, None
 
             if not import_template:
-                log.error(_('Import "%(name)s" is not valid.') %
-                          {'name': import_uri_def})
-                ExceptionCollector.appendException(
-                    ImportError(_('Import "%s" is not valid.') %
-                                import_uri_def))
+                err_msg = (_('Import "%(name)s" is not valid.' % {'name': import_uri_def}))
+                log.error(err_msg)
+                ExceptionCollector.appendException(ImportError(err_msg))
                 return None, None
             return import_template, YAML_LOADER(import_template, a_file)
 
         if short_import_notation:
-            log.error(_('Import "%(name)s" is not valid.') % import_uri_def)
-            ExceptionCollector.appendException(
-                ImportError(_('Import "%s" is not valid.') % import_uri_def))
+            err_msg = (_('Import "%(name)s" is not valid.' % {'name': import_uri_def}))
+            log.error(err_msg)
+            ExceptionCollector.appendException(ImportError(err_msg))
             return None, None
 
         full_url = ""

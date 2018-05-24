@@ -200,8 +200,7 @@ class CSAR(object):
             main_tpl = self.get_main_template_yaml()
 
             if 'imports' in main_tpl:
-                ImportsLoader(main_tpl['imports'], self.temp_dir,
-                              os.path.join(self.temp_dir, main_tpl_file))
+                ImportsLoader(main_tpl['imports'], os.path.join(self.temp_dir, main_tpl_file), self.temp_dir)
 
             if 'topology_template' in main_tpl:
                 topology_template = main_tpl['topology_template']
