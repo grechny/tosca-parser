@@ -71,6 +71,7 @@ class ToscaTemplate(object):
         self.a_file = a_file
         self.input_path = None
         self.path = None
+        self.root_dir = None
         self.tpl = None
         self.nested_tosca_tpls_with_topology = {}
         self.nested_tosca_templates_with_topology = []

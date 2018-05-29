@@ -39,12 +39,15 @@ class ImportsLoader(object):
         self.importslist = importslist
         self.custom_defs = {}
         self.nested_tosca_tpls = []
-        self.root_dir = root_dir
         if not path and not tpl:
             msg = _('Input tosca template is not provided.')
             log.warning(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
         self.path = path
+        if root_dir is None:
+            self.root_dir = os.path.dirname(os.path.abspath(path))
+        else:
+            self.root_dir = root_dir
         self.repositories = {}
         if tpl and tpl.get('repositories'):
             self.repositories = tpl.get('repositories')

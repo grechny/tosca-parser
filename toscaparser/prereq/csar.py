@@ -275,7 +275,14 @@ class CSAR(object):
                     URLException(what=msg))
                 self.error_caught = True
 
+        # if used absolute path
         if os.path.isfile(os.path.join(self.temp_dir,
+                                       resource_file)):
+            return
+
+        # if used relative path
+        if os.path.isfile(os.path.join(self.temp_dir,
+                                       os.path.dirname(tpl_file),
                                        resource_file)):
             return
 
