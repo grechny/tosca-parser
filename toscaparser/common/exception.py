@@ -118,6 +118,10 @@ class UnknownOutputError(TOSCAException):
     msg_fmt = _('Unknown output "%(output_name)s" in %(where)s.')
 
 
+class MissingPropertyError(TOSCAException):
+    msg_fmt = _('%(what)s is missing property %(property)s in node definition.')
+
+
 class MissingRequiredInputError(TOSCAException):
     msg_fmt = _('%(what)s is missing required input definition '
                 'of input "%(input_name)s".')

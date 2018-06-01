@@ -12,10 +12,12 @@
 
 import logging
 
+from toscaparser.dataentity import DataEntity
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidNodeTypeError
 from toscaparser.common.exception import MissingDefaultValueError
 from toscaparser.common.exception import MissingRequiredFieldError
+from toscaparser.common.exception import MissingPropertyError
 from toscaparser.common.exception import MissingRequiredInputError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import UnknownOutputError
@@ -32,8 +34,8 @@ class SubstitutionMappings(object):
     implementation of a Node type.
     '''
 
-    SECTIONS = (NODE_TYPE, REQUIREMENTS, CAPABILITIES) = \
-               ('node_type', 'requirements', 'capabilities')
+    SECTIONS = (NODE_TYPE, PROPERTIES, REQUIREMENTS, CAPABILITIES) = \
+               ('node_type', 'properties', 'requirements', 'capabilities')
 
     OPTIONAL_OUTPUTS = ['tosca_id', 'tosca_name', 'state']
 
@@ -82,6 +84,7 @@ class SubstitutionMappings(object):
         self._validate_type()
 
         # SubstitutionMapping class syntax validation
+        self._validate_properties()
         self._validate_inputs()
         self._validate_capabilities()
         self._validate_requirements()
@@ -109,6 +112,34 @@ class SubstitutionMappings(object):
             ExceptionCollector.appendException(
                 InvalidNodeTypeError(what=node_type))
 
+    def _validate_properties(self):
+        """validate the properties of substitution mappings.
+
+        The properties defined in substitution mappings have to match the
+        properties of the node type or the substituted node. There are two
+        types of parameters: value or input variable
+        """
+
+        sm_properties = self.sub_mapping_def.get(self.PROPERTIES)
+        properties_def_objects = self.node_definition.get_properties_def_objects()
+        def_properties = set([p.name for p in properties_def_objects])
+
+        for property in sm_properties.keys() if sm_properties else []:
+            # Property in substitution mapping must be specified in node definition
+            if property not in def_properties:
+                ExceptionCollector.appendException(
+                    MissingPropertyError(
+                        what=_('SubstitutionMappings with node_type ') + self.node_type,
+                        property=property))
+            if not isinstance(sm_properties.get(property), list):
+                property_def_object = [p for p in properties_def_objects if p.name == property][0]
+                DataEntity.validate_datatype(property_def_object.schema.get("type"),
+                                             sm_properties.get(property),
+                                             property_def_object.schema,
+                                             self.custom_defs,
+                                             property)
+
+
     def _validate_inputs(self):
         """validate the inputs of substitution mappings.
 
@@ -119,19 +150,17 @@ class SubstitutionMappings(object):
         """
 
         all_inputs = set([input.name for input in self.inputs])
-        required_properties = set([p.name for p in
-                                   self.node_definition.
-                                   get_properties_def_objects()
-                                   if p.required and p.default is None])
-        # Must provide inputs for required properties of node type.
-        for property in required_properties:
+        tpls_properties = self.sub_mapping_def.get(self.PROPERTIES)
+        # Property may contain inputs in theirs values
+        for value in tpls_properties.values() if tpls_properties else []:
             # Check property which is 'required' and has no 'default' value
-            if property not in all_inputs:
-                ExceptionCollector.appendException(
-                    MissingRequiredInputError(
-                        what=_('SubstitutionMappings with node_type ')
-                        + self.node_type,
-                        input_name=property))
+            if isinstance(value, list):
+                if value[0] not in all_inputs:
+                    ExceptionCollector.appendException(
+                        MissingRequiredInputError(
+                            what=_('SubstitutionMappings with node_type ')
+                            + self.node_type,
+                            input_name=value[0]))
 
         # If the optional properties of node type need to be customized by
         # substituted node, it also is necessary to define inputs for them,
