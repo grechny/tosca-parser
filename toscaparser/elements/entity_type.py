@@ -155,10 +155,11 @@ def update_definitions(version):
     extension_defs_file = exttools.get_defs_file(version)
     loader = toscaparser.utils.yamlparser.load_yaml
     nfv_def_file = loader(extension_defs_file)
-    nfv_def = {}
-    for section in EntityType.TOSCA_DEF_SECTIONS:
-        if section in nfv_def_file.keys():
-            value = nfv_def_file[section]
-            for key in value.keys():
-                nfv_def[key] = value[key]
-    EntityType.TOSCA_DEF.update(nfv_def)
+    if nfv_def_file:
+        nfv_def = {}
+        for section in EntityType.TOSCA_DEF_SECTIONS:
+            if section in nfv_def_file.keys():
+                value = nfv_def_file[section]
+                for key in value.keys():
+                    nfv_def[key] = value[key]
+        EntityType.TOSCA_DEF.update(nfv_def)
