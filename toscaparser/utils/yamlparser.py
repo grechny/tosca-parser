@@ -28,6 +28,8 @@ else:
 
 
 def load_yaml(path, a_file=True):
+    if not path:
+        return
     f = None
     try:
         f = codecs.open(path, encoding='utf-8', errors='strict') if a_file \
