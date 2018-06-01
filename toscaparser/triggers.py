@@ -19,14 +19,14 @@ from toscaparser.entity_template import EntityTemplate
 from toscaparser.utils import validateutils
 
 SECTIONS = (DESCRIPTION, EVENT, SCHEDULE, METRIC, METADATA,
-            TARGET_FILTER, CONDITION, ACTION) = \
+            TARGET_FILTER, CONDITION, ACTION, EVENT) = \
            ('description', 'event_type', 'schedule', 'metric',
-            'metadata', 'target_filter', 'condition', 'action')
+            'metadata', 'target_filter', 'condition', 'action', 'event')
 CONDITION_KEYNAMES = (CONSTRAINT, GRANULARITY, EVALUATIONS, AGGREGATION_METHOD,
-                      THRESHOLD, COMPARISON_OPERATOR, RESOURCE_TYPE) = \
+                      THRESHOLD, COMPARISON_OPERATOR, RESOURCE_TYPE, PERIOD, METHOD) = \
                      ('constraint', 'granularity', 'evaluations',
                       'aggregation_method', 'threshold', 'comparison_operator',
-                      'resource_type')
+                      'resource_type', 'period', 'method')
 log = logging.getLogger('tosca')
 
 
