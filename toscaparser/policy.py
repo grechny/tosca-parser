@@ -68,9 +68,15 @@ class Policy(EntityTemplate):
     def _triggers(self, triggers):
         triggerObjs = []
         if triggers:
-            for name, trigger_tpl in triggers.items():
-                triggersObj = Triggers(name, trigger_tpl)
-                triggerObjs.append(triggersObj)
+            if isinstance(triggers, list):
+                for trigger in triggers :
+                    for name, trigger_tpl in trigger.items():
+                        triggersObj = Triggers(name, trigger_tpl)
+                        triggerObjs.append(triggersObj)
+            else:
+                for name, trigger_tpl in triggers.items():
+                    triggersObj = Triggers(name, trigger_tpl)
+                    triggerObjs.append(triggersObj)
         return triggerObjs
 
     def _validate_keys(self):
