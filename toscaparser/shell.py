@@ -14,6 +14,7 @@
 import argparse
 import os
 import sys
+import ast
 
 from toscaparser.tosca_template import ToscaTemplate
 from toscaparser.utils.gettextutils import _
@@ -56,16 +57,16 @@ class ParserShell(object):
         (args, extra_args) = parser.parse_known_args(argv)
         path = args.template_file
         if os.path.isfile(path):
-            self.parse(path)
+            self.parse(path, True, parse_params(extra_args))
         elif toscaparser.utils.urlutils.UrlUtils.validate_url(path):
             self.parse(path, False)
         else:
             raise ValueError(_('"%(path)s" is not a valid file.')
                              % {'path': path})
 
-    def parse(self, path, a_file=True):
+    def parse(self, path, a_file=True, parsed_params=None):
         output = None
-        tosca = ToscaTemplate(path, None, a_file)
+        tosca = ToscaTemplate(path, parsed_params, a_file)
 
         version = tosca.version
         if tosca.version:
@@ -75,6 +76,13 @@ class ParserShell(object):
             description = tosca.description
             if description:
                 print("\ndescription: " + description)
+
+        if hasattr(tosca, 'metadata'):
+            metadata = tosca.metadata
+            if metadata:
+                print("\nmetadata: ")
+                for name, value in metadata.items():
+                    print("\t", name + ": " + str(value))
 
         if hasattr(tosca, 'inputs'):
             inputs = tosca.inputs
@@ -91,7 +99,7 @@ class ParserShell(object):
                     print("\t" + node.name)
 
         # example of retrieving policy object
-        '''if hasattr(tosca, 'policies'):
+        if hasattr(tosca, 'policies'):
             policies = tosca.policies
             if policies:
                 print("policies:")
@@ -100,7 +108,7 @@ class ParserShell(object):
                     if policy.triggers:
                         print("\ttriggers:")
                         for trigger in policy.triggers:
-                            print("\ttrigger name:" + trigger.name)'''
+                            print("\ttrigger name:" + trigger.name)
 
         if hasattr(tosca, 'outputs'):
             outputs = tosca.outputs
@@ -109,6 +117,12 @@ class ParserShell(object):
                 for output in outputs:
                     print("\t" + output.name)
 
+def parse_params(extra_args):
+    parsed_params = {}
+    for ext in extra_args:
+        ext_dict = ast.literal_eval(ext)
+        parsed_params.update(ext_dict)
+    return parsed_params
 
 def main(args=None):
     if args is None:
