@@ -34,8 +34,8 @@ class SubstitutionMappings(object):
     implementation of a Node type.
     '''
 
-    SECTIONS = (NODE_TYPE, PROPERTIES, REQUIREMENTS, CAPABILITIES) = \
-               ('node_type', 'properties', 'requirements', 'capabilities')
+    SECTIONS = (NODE_TYPE, PROPERTIES, REQUIREMENTS, CAPABILITIES, INTERFACES) = \
+               ('node_type', 'properties', 'requirements', 'capabilities', 'interfaces')
 
     OPTIONAL_OUTPUTS = ['tosca_id', 'tosca_name', 'state']
 
