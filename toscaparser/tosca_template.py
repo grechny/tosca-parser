@@ -102,6 +102,7 @@ class ToscaTemplate(object):
             self.description = self._tpl_description()
             self.topology_template = self._topology_template()
             self.repositories = self._tpl_repositories()
+            self.metadata = self._tpl_metadata()
             if self.topology_template.tpl:
                 self.inputs = self._inputs()
                 self.relationship_templates = self._relationship_templates()
@@ -152,6 +153,9 @@ class ToscaTemplate(object):
                 reposits = Repository(name, val)
                 reposit.append(reposits)
         return reposit
+
+    def _tpl_metadata(self):
+        return self.tpl.get(METADATA)
 
     def _tpl_relationship_types(self):
         return self._get_custom_types(RELATIONSHIP_TYPES)
