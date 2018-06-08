@@ -9,11 +9,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
+from toscaparser.elements.capabilitytype import CapabilityTypeDef
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidTypeError
 from toscaparser.common.exception import UnknownFieldError
+from toscaparser.elements.capabilities import CapabilityDefinitions
 from toscaparser.elements.statefulentitytype import StatefulEntityType
 
 
@@ -50,6 +51,48 @@ class GroupType(StatefulEntityType):
         if self.METADATA in self.defs:
             self.meta_data = self.defs[self.METADATA]
             self._validate_metadata(self.meta_data)
+
+
+    @property
+    def capabilities(self):
+        return self.get_capabilities_objects()
+
+    def get_capabilities_objects(self):
+        '''Return a list of capability objects.'''
+        typecapabilities = []
+        caps = self.get_value(self.CAPABILITIES, None, True)
+        if caps:
+            # 'name' is symbolic name of the capability
+            # 'value' is a dict { 'type': <capability type name> }
+            for name, value in caps.items():
+                ctype = value.get('type')
+                cap = CapabilityTypeDef(name, ctype, self.type,
+                                        self.custom_def)
+                typecapabilities.append(cap)
+        return typecapabilities
+
+    def get_capabilities(self):
+        '''Return a dictionary of capability name-objects pairs.'''
+        return {cap.name: cap
+                for cap in self.get_capabilities_objects()}
+
+    def get_capability(self, name):
+        caps = self.get_capabilities()
+        if caps and name in caps.keys():
+            return caps[name]
+
+    def get_capability_type(self, name):
+        captype = self.get_capability(name)
+        if captype:
+            return captype.type
+
+    @property
+    def requirements(self):
+        return self.get_value(self.REQUIREMENTS, None, True)
+
+    def get_all_requirements(self):
+        return self.requirements
+
 
     @property
     def parent_type(self):
