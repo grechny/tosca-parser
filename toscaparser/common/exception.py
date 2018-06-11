@@ -102,6 +102,10 @@ class RangeValueError(TOSCAException):
                 'range "(min:%(vmin)s, max:%(vmax)s)".')
 
 
+class InvalidFormatError(TOSCAException):
+    msg_fmt = _('%(what)s has invalid format of "%(field)s".')
+
+
 class InvalidSchemaError(TOSCAException):
     msg_fmt = _('%(message)s')
 

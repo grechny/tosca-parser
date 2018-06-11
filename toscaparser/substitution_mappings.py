@@ -15,6 +15,7 @@ import logging
 from toscaparser.dataentity import DataEntity
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidNodeTypeError
+from toscaparser.common.exception import InvalidFormatError
 from toscaparser.common.exception import MissingDefaultValueError
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import MissingPropertyError
@@ -23,6 +24,7 @@ from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import UnknownOutputError
 from toscaparser.elements.nodetype import NodeType
 from toscaparser.utils.gettextutils import _
+from toscaparser.utils import validateutils
 
 log = logging.getLogger('tosca')
 
@@ -67,12 +69,20 @@ class SubstitutionMappings(object):
         return self.sub_mapping_def.get(self.NODE_TYPE)
 
     @property
+    def properties(self):
+        return self.sub_mapping_def.get(self.PROPERTIES)
+
+    @property
     def capabilities(self):
         return self.sub_mapping_def.get(self.CAPABILITIES)
 
     @property
     def requirements(self):
         return self.sub_mapping_def.get(self.REQUIREMENTS)
+
+    @property
+    def interfaces(self):
+        return self.sub_mapping_def.get(self.INTERFACES)
 
     @property
     def node_definition(self):
@@ -88,6 +98,7 @@ class SubstitutionMappings(object):
         self._validate_inputs()
         self._validate_capabilities()
         self._validate_requirements()
+        self._validate_interfaces()
         self._validate_outputs()
 
     def _validate_keys(self):
@@ -138,7 +149,6 @@ class SubstitutionMappings(object):
                                              property_def_object.schema,
                                              self.custom_defs,
                                              property)
-
 
     def _validate_inputs(self):
         """validate the inputs of substitution mappings.
@@ -219,6 +229,21 @@ class SubstitutionMappings(object):
                 # ExceptionCollector.appendException(
                 #    UnknownFieldError(what='SubstitutionMappings',
                 #                      field=req))
+
+    def _validate_interfaces(self):
+        interfaces = self.sub_mapping_def.get(self.INTERFACES)
+        if interfaces:
+            if isinstance(interfaces, dict):
+                for interface_key, operations in interfaces.items():
+                    validateutils.validate_string(interface_key)
+                    if operations and isinstance(operations, dict):
+                        for operation, workflow_name in operations.items():
+                            validateutils.validate_string(operation)
+                            validateutils.validate_string(workflow_name)
+            else:
+                ExceptionCollector.appendException(
+                    InvalidFormatError(what='SubstitutionMappings',
+                                       field=self.INTERFACES))
 
     def _validate_outputs(self):
         """validate the outputs of substitution mappings.
