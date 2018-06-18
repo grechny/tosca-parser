@@ -163,7 +163,10 @@ class ToscaTemplate(object):
         return self._get_custom_types(RELATIONSHIP_TYPES)
 
     def _tpl_artifact_types(self):
-        return self._get_custom_types(ARTIFACT_TYPES, self.imports.get('imports'))
+        if self.imports:
+            return self._get_custom_types(ARTIFACT_TYPES, self.imports.get('imports'))
+        else:
+            return self._get_custom_types(ARTIFACT_TYPES)
 
     def _tpl_relationship_templates(self):
         topology_template = self._tpl_topology_template()
