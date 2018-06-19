@@ -14,7 +14,6 @@ from toscaparser.elements.capabilitytype import CapabilityTypeDef
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidTypeError
 from toscaparser.common.exception import UnknownFieldError
-from toscaparser.elements.capabilities import CapabilityDefinitions
 from toscaparser.elements.statefulentitytype import StatefulEntityType
 
 
