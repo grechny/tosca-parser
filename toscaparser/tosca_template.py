@@ -111,8 +111,6 @@ class ToscaTemplate(object):
                 self.policies = self._policies()
                 self._handle_nested_tosca_templates_with_topology()
                 self.graph = ToscaGraph(self.nodetemplates)
-                self.imports = self._get_custom_types([IMPORTS], None)
-                self.artifact_types = self._tpl_artifact_types()
 
         ExceptionCollector.stop()
         self.verify_template()
@@ -162,12 +160,6 @@ class ToscaTemplate(object):
     def _tpl_relationship_types(self):
         return self._get_custom_types(RELATIONSHIP_TYPES)
 
-    def _tpl_artifact_types(self):
-        if self.imports:
-            return self._get_custom_types(ARTIFACT_TYPES, self.imports.get('imports'))
-        else:
-            return self._get_custom_types(ARTIFACT_TYPES)
-
     def _tpl_relationship_templates(self):
         topology_template = self._tpl_topology_template()
         return topology_template.get(RELATIONSHIP_TEMPLATES)
@@ -178,9 +170,10 @@ class ToscaTemplate(object):
     def _policies(self):
         return self.topology_template.policies
 
+    # todo: add possibility to get all custom defs for single type
     def _get_all_custom_defs(self, imports=None):
         types = [IMPORTS, NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
-                  DATA_TYPES, INTERFACE_TYPES, POLICY_TYPES, GROUP_TYPES,ARTIFACT_TYPES]
+                 DATA_TYPES, INTERFACE_TYPES, POLICY_TYPES, GROUP_TYPES, ARTIFACT_TYPES]
         custom_defs_final = {}
         custom_defs = self._get_custom_types(types, imports)
         if custom_defs:
