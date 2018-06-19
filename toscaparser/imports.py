@@ -44,7 +44,7 @@ class ImportsLoader(object):
             log.warning(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
         self.path = path
-        self.root_dir = root_dir or os.path.dirname(os.path.abspath(path))
+        self.root_dir = root_dir or os.path.dirname(os.path.abspath(path)) if path else None
         self.repositories = {}
         if tpl and tpl.get('repositories'):
             self.repositories = tpl.get('repositories')
