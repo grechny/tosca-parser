@@ -82,7 +82,7 @@ class ParserShell(object):
             if metadata:
                 print("\nmetadata: ")
                 for name, value in metadata.items():
-                    print("\t", name + ": " + str(value))
+                    print("\t" + name + ": " + str(value))
 
         if hasattr(tosca, 'inputs'):
             inputs = tosca.inputs
