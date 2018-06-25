@@ -64,21 +64,22 @@ class ToscaTemplate(object):
     ADDITIONAL_SECTIONS.update(exttools.get_sections())
 
     '''Load the template data.'''
-    def __init__(self, path=None, parsed_params=None, a_file=True,
-                 yaml_dict_tpl=None):
+    def __init__(self, path=None, parsed_params=None,
+                 a_file=True, yaml_dict_tpl=None, root_dir=None):
 
         ExceptionCollector.start()
         self.a_file = a_file
         self.input_path = None
         self.path = None
-        self.root_dir = None
         self.tpl = None
+        self.root_dir = root_dir
         self.nested_tosca_tpls_with_topology = {}
         self.nested_tosca_templates_with_topology = []
         if path:
             self.input_path = path
-            self.root_dir = os.path.dirname(self.input_path)
             self.path = self._get_path(path)
+            if not self.root_dir:
+                self.root_dir = os.path.dirname(self.input_path)
             if self.path:
                 self.tpl = YAML_LOADER(self.path, self.a_file)
             if yaml_dict_tpl:
