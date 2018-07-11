@@ -15,6 +15,9 @@ import logging
 import os
 
 from copy import deepcopy
+
+# from oslo_config import cfg
+
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidTemplateVersion
 from toscaparser.common.exception import MissingRequiredFieldError
@@ -50,7 +53,7 @@ SPECIAL_SECTIONS = (METADATA) = ('metadata')
 log = logging.getLogger("tosca.model")
 
 YAML_LOADER = toscaparser.utils.yamlparser.load_yaml
-
+# CONF = cfg.CONF
 
 class ToscaTemplate(object):
     exttools = ExtTools()
@@ -65,7 +68,7 @@ class ToscaTemplate(object):
 
     '''Load the template data.'''
     def __init__(self, path=None, parsed_params=None,
-                 a_file=True, yaml_dict_tpl=None, root_dir=None):
+                 a_file=True, yaml_dict_tpl=None, root_dir=None, keep_extracted_dir=None):
 
         ExceptionCollector.start()
         self.a_file = a_file
@@ -73,6 +76,7 @@ class ToscaTemplate(object):
         self.path = None
         self.tpl = None
         self.root_dir = root_dir
+        self.keep_extracted_dir=keep_extracted_dir
         self.nested_tosca_tpls_with_topology = {}
         self.nested_tosca_templates_with_topology = []
         if path:
@@ -285,7 +289,7 @@ class ToscaTemplate(object):
             return path
         elif path.lower().endswith(('.zip', '.csar')):
             # a CSAR archive
-            csar = CSAR(path, self.a_file)
+            csar = CSAR(path, self.a_file, self.keep_extracted_dir)
             if csar.validate():
                 csar.decompress()
                 self.a_file = True  # the file has been decompressed locally

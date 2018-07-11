@@ -33,13 +33,14 @@ except ImportError:  # Python 3.x
 
 class CSAR(object):
 
-    def __init__(self, csar_file, a_file=True):
+    def __init__(self, csar_file, a_file=True, keep_extracted_dir=None):
         self.path = csar_file
         self.a_file = a_file
         self.is_validated = False
         self.error_caught = False
         self.csar = None
         self.temp_dir = None
+        self.keep_extracted_dir = keep_extracted_dir
 
     def validate(self):
         """Validate the provided CSAR file."""
@@ -180,7 +181,10 @@ class CSAR(object):
     def decompress(self):
         if not self.is_validated:
             self.validate()
-        self.temp_dir = tempfile.NamedTemporaryFile().name
+        if self.keep_extracted_dir:
+            self.temp_dir = self.keep_extracted_dir
+        else:
+            self.temp_dir = tempfile.NamedTemporaryFile().name
         with zipfile.ZipFile(self.csar, "r") as zf:
             zf.extractall(self.temp_dir)
 
@@ -247,7 +251,7 @@ class CSAR(object):
                                     #             main_tpl_file,
                                     #             operation['implementation'])
         finally:
-            if self.temp_dir:
+            if ((self.keep_extracted_dir is not None) and self.temp_dir):
                 shutil.rmtree(self.temp_dir)
 
     def _validate_external_reference(self, tpl_file, resource_file,
