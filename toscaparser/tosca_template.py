@@ -285,6 +285,9 @@ class ToscaTemplate(object):
                 update_definitions(version)
 
     def _get_path(self, path):
+        # return root dir as path for unzipped catalog
+        # if not self.a_file and os.path.isdir(path):
+        #     return path
         if path.lower().endswith('.yaml') or path.lower().endswith('.yml'):
             return path
         elif path.lower().endswith(('.zip', '.csar')):
@@ -295,6 +298,10 @@ class ToscaTemplate(object):
                 self.a_file = True  # the file has been decompressed locally
                 self.root_dir = csar.temp_dir
                 return os.path.join(csar.temp_dir, csar.get_main_template())
+        elif ((os.path.isdir(path)) and (not self.a_file)):
+            csar = CSAR(path, self.a_file)
+            csar.validate()
+            return os.path.join(csar.temp_dir, csar.get_main_template())
         else:
             ExceptionCollector.appendException(
                 ValueError(_('"%(path)s" is not a valid file.')

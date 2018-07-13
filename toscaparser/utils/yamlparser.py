@@ -15,6 +15,7 @@ from collections import OrderedDict
 
 from six.moves import urllib
 import yaml
+import os.path
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import URLException
@@ -32,7 +33,7 @@ def load_yaml(path, a_file=True):
         return
     f = None
     try:
-        f = codecs.open(path, encoding='utf-8', errors='strict') if a_file \
+        f = codecs.open(path, encoding='utf-8', errors='strict') if (a_file or os.path.isfile(path)) \
             else urllib.request.urlopen(path)
     except urllib.error.URLError as e:
         if hasattr(e, 'reason'):
